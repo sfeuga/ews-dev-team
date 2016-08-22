@@ -1,0 +1,22 @@
+<snippet>
+    <content><![CDATA[summary: 'Returns ...',
+detail: 'Returns ...',
+is_array: false,
+entity: EventWS::Presenters::,
+http_codes: [
+  {code: 400, message: 'Bad Request'},
+  {code: 401, message: 'Unauthorized. The authentication data are either missing, outdated or incorrect'},
+  {code: 403, message: 'Forbidden. The user is authenticated but not authorized to perform this operation'},
+  {code: 404, message: 'Not Found. The requested resource was not found'},
+  {code: 409, message: 'Conflict. The ressource you try to update conflict with another ressource'},
+  {code: 409, message: 'Conflict. The ressource you try to update has been updated by another user'}
+],
+headers: {'XAuthToken' => {description: 'The Bearer Token', required: true}}
+]]></content>
+    <!-- Optional: Tab trigger to activate the snippet -->
+    <tabTrigger>summary:</tabTrigger>
+    <!-- Optional: Scope the tab trigger will be active in -->
+    <!-- <scope>source.python</scope> -->
+    <!-- Optional: Description to show in the menu -->
+    <description>GrapeSwagger template</description>
+</snippet>

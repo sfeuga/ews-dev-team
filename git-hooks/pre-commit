@@ -1,0 +1,22 @@
+#!/bin/sh
+#
+# The hook should exit with non-zero status after issuing an
+# appropriate message if it wants to stop the commit.
+
+FILE="Gemfile.lock"
+
+git diff --cached --name-only | if grep --quiet "$FILE"; then
+  sed 's#http:/[^",]*/#http://github.com/WEForum/#' Gemfile.lock > tmp 
+  RESULT=$?
+  if [ $RESULT -ne 0 ]; then
+    cat <<\EOF
+Error: Attempt to remove token from Gemfile.lock.
+
+Please check the remote GEM URL into the Gemfile.lock file before commit.
+EOF    
+    exit 1
+  else
+    mv -f tmp Gemfile.lock
+    git add Gemfile.lock
+  fi
+fi

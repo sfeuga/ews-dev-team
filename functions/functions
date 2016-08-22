@@ -1,0 +1,84 @@
+##################
+###  helpers   ###
+##################
+
+installVimPlugins() {
+  if [[ -d $HOME/.vim/bundle/Vundle.vim ]]; then
+    vim +PluginInstall +qall
+  else
+    git clone https://github.com/VundleVim/Vundle.vim.git $HOME/.vim/bundle/Vundle.vim
+    vim +PluginInstall +qall
+  fi
+}
+
+### Git
+NoUpdateSinceMonths() {
+  branchList=$(
+    for branch in $(git branch -r | egrep -v -w 'HEAD|master|qa|V2'); do
+      echo -e "$(git show --format="%cr" $branch | head -n 1) \\t$branch" | grep 'month';
+    done | awk '{print $NF}' | sed 's/origin\///'
+  )
+}
+
+DeleteUnusedBranch() {
+  cleanBranch
+  NoUpdateSinceMonths
+  git push origin $branchList --delete -n
+  echo -n "Did you want to delete all this remote branchs (y|N) :"
+  read yn
+  case $yn in
+    [yY] | [yY][Ee][Ss] )
+      git push origin $branchList --delete;
+      ;;
+    [nN] | [n|N][O|o] )
+      exit 1;
+      ;;
+  esac
+}
+
+LastCommitNumber() {
+  commitNumber=$(git log -n 1 | head -n 1 | awk '{print $NF}')
+}
+
+### Ruby
+RubocopMyFiles() {
+  echo "Rubocop :"
+  for f in $(git status -s | awk \'{print $NF}\' | grep .rb); do
+    echo "test du fichier : $f";
+    rubocop $f;
+  done
+  echo "-----------------------------"
+  echo ""
+}
+
+RubocopAfterCommit() {
+  LastCommitNumber
+  echo "Rubocop :"
+  for f in $(git diff-tree --no-commit-id --name-only -r $commitNumber | egrep *.rb); do
+    echo "test du fichier : $f";
+    rubocop $f;
+  done;
+  echo "-----------------------------"
+  echo ""
+}
+
+ReekMyFiles() {
+  echo "Reek:"
+  for f in $(git status -s | awk \'{print $NF}\' | grep .rb); do
+    echo "test du fichier : $f";
+    reek $f;
+  done;
+  echo "-----------------------------"
+  echo ""
+}
+
+ReekAfterCommit() {
+  LastCommitNumber
+  echo "Reek :"
+  for f in $(git diff-tree --no-commit-id --name-only -r $commitNumber | egrep *.rb); do
+    echo "test du fichier : $f";
+    reek $f;
+  done;
+  echo "-----------------------------"
+  echo ""
+}
